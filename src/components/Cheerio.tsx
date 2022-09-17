@@ -1,12 +1,12 @@
 import { useRef, Suspense, useMemo } from "react";
 import { Geometry, ConvexGeometry } from "three-stdlib";
 import { useConvexPolyhedron } from "@react-three/cannon";
-import { TorusGeometry } from "three";
+import { useLoader } from "@react-three/fiber";
+import { TextureLoader, TorusGeometry } from "three";
 import convert from "color-convert";
 
 /**
  * Returns legacy geometry vertices, faces for ConvP
- * @param {import("three").BufferGeometry} bufferGeometry
  */
 function toConvexProps(bufferGeometry: any) {
   const geo = new Geometry().fromBufferGeometry(bufferGeometry);
@@ -38,6 +38,19 @@ export type CheerioProps = {
 };
 
 function Cheerio({ initialPos, gold, pastel }: CheerioProps) {
+  // const height = useLoader(
+  //   TextureLoader,
+  //   "/textures/Wall_Plaster_002_Height.png"
+  // );
+  // const normal = useLoader(
+  //   TextureLoader,
+  //   "/textures/Wall_Plaster_002_Normal.jpg"
+  // );
+  // const ao = useLoader(
+  //   TextureLoader,
+  //   "/textures/Wall_Plaster_002_AmbientOcclusion.jpg"
+  // );
+
   const geo = useMemo(
     () => toConvexProps(new TorusGeometry(RADIUS, TUBE, 8, 6)),
     []
@@ -45,18 +58,28 @@ function Cheerio({ initialPos, gold, pastel }: CheerioProps) {
   const [ref] = useConvexPolyhedron(() => ({
     mass: 1,
     position: initialPos,
+    rotation: [
+      Math.random() * 2 * Math.PI,
+      Math.random() * 2 * Math.PI,
+      Math.random() * 2 * Math.PI,
+    ],
     args: geo as any,
   }));
 
   return (
-    <mesh ref={ref as any} rotation={[Math.PI / 2, 0, Math.PI / 2]}>
-      <torusGeometry args={[RADIUS, TUBE, 64, 48]} />
-      <meshStandardMaterial
-        color={pastel ? getPastel(initialPos[0]) : "#EBAF4C"}
-        metalness={gold ? 1.0 : 0.0}
-        roughness={gold ? 0.0 : 0.5}
-      />
-    </mesh>
+    <Suspense fallback={null}>
+      <mesh ref={ref as any}>
+        <torusGeometry args={[RADIUS, TUBE, 64, 48]} />
+        <meshStandardMaterial
+          color={pastel ? getPastel(initialPos[0]) : "#EBAF4C"}
+          metalness={gold ? 1.0 : 0.0}
+          roughness={gold ? 0.0 : 0.5}
+          // displacementMap={height}
+          // normalMap={normal}
+          // aoMap={ao}
+        />
+      </mesh>
+    </Suspense>
   );
 }
 

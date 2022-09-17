@@ -17,7 +17,7 @@ import Cheerio from "./components/Cheerio";
 function Table() {
   const [ref] = usePlane(() => ({
     rotation: [-Math.PI / 2, 0, 0],
-    position: [0, -2.01, 0],
+    position: [0, -2.001, 0],
   }));
 
   return (
@@ -35,9 +35,9 @@ function Table() {
 
 function App() {
   const settings = useTweaks({
-    rotate: false,
+    autorotate: false,
     gold: false,
-    pastel: false,
+    fruit: false,
   }) as any;
 
   return (
@@ -50,7 +50,7 @@ function App() {
         shadows
       >
         <PerspectiveCamera makeDefault fov={30} position={[-10, 5, -18]} />
-        <OrbitControls makeDefault autoRotate={settings.rotate} />
+        <OrbitControls makeDefault autoRotate={settings.autorotate} />
 
         <color attach="background" args={["#f8f8f8"]} />
         {/* <Backdrop receiveShadow scale={25.0} position={[0, -6, 0]}>
@@ -58,7 +58,7 @@ function App() {
         </Backdrop> */}
         <Environment preset="city" />
 
-        <ambientLight intensity={0.8} />
+        <ambientLight intensity={0.5} />
 
         {/* <group>
           <ambientLight intensity={0.08} />
@@ -74,11 +74,11 @@ function App() {
               key={i}
               initialPos={[
                 1 * Math.sin(53 * i * i),
-                5 + i,
+                5 + i / 3 + 0.5 * Math.sin(83 * i * i),
                 1 * Math.sin(93 * i * i),
               ]}
               gold={settings.gold}
-              pastel={settings.pastel}
+              pastel={settings.fruit}
             />
           ))}
           {/* <Cheerio initialPos={[0, 4, 2]} />
