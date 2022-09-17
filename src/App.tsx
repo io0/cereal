@@ -5,41 +5,14 @@ import {
   Environment,
   OrbitControls,
   PerspectiveCamera,
-  Stage,
 } from "@react-three/drei";
-import {
-  Physics,
-  useBox,
-  usePlane,
-  useCylinder,
-  useConvexPolyhedron,
-  useHeightfield,
-  Debug,
-} from "@react-three/cannon";
-import { TorusGeometry, DoubleSide } from "three";
-import { Geometry, ConvexGeometry } from "three-stdlib";
+import { Physics, usePlane } from "@react-three/cannon";
+import { DoubleSide } from "three";
+import { useTweaks } from "use-tweaks";
 
 import Bowl from "./components/Bowl";
+import Cheerio from "./components/Cheerio";
 // import WackyBox from "./components/WackyBox";
-
-/**
- * Returns legacy geometry vertices, faces for ConvP
- * @param {THREE.BufferGeometry} bufferGeometry
- */
-function toConvexProps(bufferGeometry: any) {
-  const geo = new Geometry().fromBufferGeometry(bufferGeometry);
-  geo.mergeVertices();
-
-  const convBufferGeo = new ConvexGeometry(geo.vertices);
-  const convGeo = new Geometry().fromBufferGeometry(convBufferGeo);
-  convGeo.mergeVertices();
-
-  return [
-    convGeo.vertices.map((v) => v.toArray()),
-    convGeo.faces.map((f) => [f.a, f.b, f.c]),
-    [],
-  ];
-}
 
 function Table() {
   const [ref] = usePlane(() => ({
@@ -60,33 +33,13 @@ function Table() {
   );
 }
 
-const RADIUS = 0.2;
-const TUBE = 0.08;
-
-export type CheerioProps = {
-  initialPos: [number, number, number];
-};
-
-function Cheerio(props: CheerioProps) {
-  const geo = useMemo(
-    () => toConvexProps(new TorusGeometry(RADIUS, TUBE, 8, 6)),
-    []
-  );
-  const [ref] = useConvexPolyhedron(() => ({
-    mass: 1,
-    position: props.initialPos,
-    args: geo as any,
-  }));
-
-  return (
-    <mesh ref={ref as any} rotation={[Math.PI / 2, 0, Math.PI / 2]}>
-      <torusGeometry args={[RADIUS, TUBE, 64, 48]} />
-      <meshStandardMaterial color="#EBAF4C" />
-    </mesh>
-  );
-}
-
 function App() {
+  const settings = useTweaks({
+    rotate: false,
+    gold: false,
+    pastel: false,
+  }) as any;
+
   return (
     <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}>
       <Canvas
@@ -97,15 +50,15 @@ function App() {
         shadows
       >
         <PerspectiveCamera makeDefault fov={30} position={[-10, 5, -18]} />
-        <OrbitControls makeDefault />
+        <OrbitControls makeDefault autoRotate={settings.rotate} />
 
-        <color attach="background" args={["#fff"]} />
+        <color attach="background" args={["#f8f8f8"]} />
         {/* <Backdrop receiveShadow scale={25.0} position={[0, -6, 0]}>
-            <meshStandardMaterial color="#353540" />
-          </Backdrop> */}
+          <meshStandardMaterial color="#353540" />
+        </Backdrop> */}
         <Environment preset="city" />
 
-        <ambientLight intensity={5.0} />
+        <ambientLight intensity={0.8} />
 
         {/* <group>
           <ambientLight intensity={0.08} />
@@ -120,10 +73,12 @@ function App() {
             <Cheerio
               key={i}
               initialPos={[
-                4 * (Math.random() - 0.5),
+                2 * Math.sin(53 * i * i),
                 5 + i,
-                4 * (Math.random() - 0.5),
+                2 * Math.sin(53 * i * i),
               ]}
+              gold={settings.gold}
+              pastel={settings.pastel}
             />
           ))}
           {/* <Cheerio initialPos={[0, 4, 2]} />
