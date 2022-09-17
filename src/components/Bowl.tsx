@@ -1,9 +1,8 @@
-import { Suspense } from "react";
 import { useHeightfield } from "@react-three/cannon";
 import { useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three-stdlib/loaders/GLTFLoader";
 
-import bowlObject from "../assets/bowl.gltf?url";
+import bowlObject from "../assets/bowl.glb?url";
 
 const createHeightField = () => {
   let matrix: number[][] = [];
@@ -25,7 +24,7 @@ function Heightfield() {
   const heightField = createHeightField();
   const [ref] = useHeightfield(() => ({
     args: [heightField, { elementSize: 3 / 7.65 }],
-    position: [-3, -2, 3],
+    position: [-3, -1, 3],
     rotation: [-Math.PI / 2, 0, 0],
   }));
   return <mesh ref={ref as any}></mesh>;
@@ -36,9 +35,7 @@ function Bowl() {
   return (
     <>
       <Heightfield />
-      <Suspense fallback={null}>
-        <primitive object={gltf.scene} scale={3} position={[0, -2, 0]} />
-      </Suspense>
+      <primitive object={gltf.scene} scale={3} position={[0, -1, 0]} />
     </>
   );
 }

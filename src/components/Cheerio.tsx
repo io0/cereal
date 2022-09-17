@@ -1,14 +1,11 @@
-import { useRef, Suspense, useMemo } from "react";
+import { useMemo } from "react";
 import { Geometry, ConvexGeometry } from "three-stdlib";
 import { useConvexPolyhedron } from "@react-three/cannon";
 import { useLoader } from "@react-three/fiber";
-import { TextureLoader, TorusGeometry } from "three";
+import { type BufferGeometry, TextureLoader, TorusGeometry } from "three";
 import convert from "color-convert";
 
-/**
- * Returns legacy geometry vertices, faces for ConvP
- */
-function toConvexProps(bufferGeometry: any) {
+function toConvexProps(bufferGeometry: BufferGeometry) {
   const geo = new Geometry().fromBufferGeometry(bufferGeometry);
   geo.mergeVertices();
 
@@ -29,7 +26,7 @@ function getPastel(seed: number): string {
 }
 
 const RADIUS = 0.2;
-const TUBE = 0.08;
+const TUBE = 0.09;
 
 export type CheerioProps = {
   initialPos: [number, number, number];
@@ -38,18 +35,18 @@ export type CheerioProps = {
 };
 
 function Cheerio({ initialPos, gold, pastel }: CheerioProps) {
-  // const height = useLoader(
-  //   TextureLoader,
-  //   "/textures/Wall_Plaster_002_Height.png"
-  // );
-  // const normal = useLoader(
-  //   TextureLoader,
-  //   "/textures/Wall_Plaster_002_Normal.jpg"
-  // );
-  // const ao = useLoader(
-  //   TextureLoader,
-  //   "/textures/Wall_Plaster_002_AmbientOcclusion.jpg"
-  // );
+  const height = useLoader(
+    TextureLoader,
+    "/textures/Wall_Plaster_002_Height.png"
+  );
+  const normal = useLoader(
+    TextureLoader,
+    "/textures/Wall_Plaster_002_Normal.jpg"
+  );
+  const ao = useLoader(
+    TextureLoader,
+    "/textures/Wall_Plaster_002_AmbientOcclusion.jpg"
+  );
 
   const geo = useMemo(
     () => toConvexProps(new TorusGeometry(RADIUS, TUBE, 8, 6)),
@@ -67,19 +64,18 @@ function Cheerio({ initialPos, gold, pastel }: CheerioProps) {
   }));
 
   return (
-    <Suspense fallback={null}>
-      <mesh ref={ref as any}>
-        <torusGeometry args={[RADIUS, TUBE, 64, 48]} />
-        <meshStandardMaterial
-          color={pastel ? getPastel(initialPos[0]) : "#EBAF4C"}
-          metalness={gold ? 1.0 : 0.0}
-          roughness={gold ? 0.0 : 0.5}
-          // displacementMap={height}
-          // normalMap={normal}
-          // aoMap={ao}
-        />
-      </mesh>
-    </Suspense>
+    <mesh ref={ref as any} castShadow receiveShadow>
+      <torusGeometry args={[RADIUS, TUBE, 64, 48]} />
+      <meshStandardMaterial
+        color={pastel ? getPastel(initialPos[0]) : "#EBAF4C"}
+        metalness={gold ? 1.0 : 0.0}
+        roughness={gold ? 0.0 : 0.5}
+        displacementMap={height}
+        displacementScale={0.05}
+        normalMap={normal}
+        aoMap={ao}
+      />
+    </mesh>
   );
 }
 

@@ -1,7 +1,6 @@
-import { useRef, Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import {
-  Backdrop,
   Environment,
   OrbitControls,
   PerspectiveCamera,
@@ -17,14 +16,14 @@ import Cheerio from "./components/Cheerio";
 function Table() {
   const [ref] = usePlane(() => ({
     rotation: [-Math.PI / 2, 0, 0],
-    position: [0, -2.001, 0],
+    position: [0, -1.001, 0],
   }));
 
   return (
-    <mesh ref={ref as any}>
+    <mesh ref={ref as any} receiveShadow>
       <planeGeometry args={[10, 10]} />
       <meshStandardMaterial
-        color="#ce8788"
+        color="#e78688"
         metalness={1.0}
         roughness={0.25}
         side={DoubleSide}
@@ -42,56 +41,55 @@ function App() {
 
   return (
     <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}>
-      <Canvas
-        onCreated={(canvasCtx) => {
-          canvasCtx.gl.pixelRatio = window.devicePixelRatio;
-          canvasCtx.gl.physicallyCorrectLights = true;
-        }}
-        shadows
-      >
-        <PerspectiveCamera makeDefault fov={30} position={[-10, 5, -18]} />
-        <OrbitControls makeDefault autoRotate={settings.autorotate} />
+      <Suspense fallback={null}>
+        <Canvas
+          onCreated={(canvasCtx) => {
+            canvasCtx.gl.pixelRatio = window.devicePixelRatio;
+            canvasCtx.gl.physicallyCorrectLights = true;
+          }}
+          shadows
+        >
+          <PerspectiveCamera makeDefault fov={30} position={[-7, 8, -16]} />
+          <OrbitControls makeDefault autoRotate={settings.autorotate} />
 
-        <color attach="background" args={["#f8f8f8"]} />
-        {/* <Backdrop receiveShadow scale={25.0} position={[0, -6, 0]}>
-          <meshStandardMaterial color="#353540" />
-        </Backdrop> */}
-        <Environment preset="city" />
+          {/* <Backdrop receiveShadow scale={25.0} position={[0, -6, 0]}>
+            <meshStandardMaterial color="#353540" />
+          </Backdrop> */}
+          <Environment background files="/textures/dresden_square_1k.hdr" />
 
-        <ambientLight intensity={0.5} />
+          {/* <group>
+            <ambientLight intensity={0.08} />
+            <pointLight intensity={20} position={[10, 10, 10]} />
+          </group> */}
 
-        {/* <group>
-          <ambientLight intensity={0.08} />
-          <pointLight intensity={20} position={[10, 10, 10]} />
-        </group> */}
-
-        {/* <WackyBox position={[-1.2, 0, 0]} /> */}
-        {/* <WackyBox position={[1.2, 0, 0]} /> */}
-        <Physics>
-          {/* <Debug color="green" scale={1.1}> */}
-          {[...Array(25)].map((_, i) => (
-            <Cheerio
-              key={i}
-              initialPos={[
-                1 * Math.sin(53 * i * i),
-                5 + i / 3 + 0.5 * Math.sin(83 * i * i),
-                1 * Math.sin(93 * i * i),
-              ]}
-              gold={settings.gold}
-              pastel={settings.fruit}
-            />
-          ))}
-          {/* <Cheerio initialPos={[0, 4, 2]} />
+          {/* <WackyBox position={[-1.2, 0, 0]} /> */}
+          {/* <WackyBox position={[1.2, 0, 0]} /> */}
+          <Physics>
+            {/* <Debug color="green" scale={1.1}> */}
+            {[...Array(25)].map((_, i) => (
+              <Cheerio
+                key={i}
+                initialPos={[
+                  1 * Math.sin(53 * i * i),
+                  5 + i / 3 + 0.5 * Math.sin(83 * i * i),
+                  1 * Math.sin(93 * i * i),
+                ]}
+                gold={settings.gold}
+                pastel={settings.fruit}
+              />
+            ))}
+            {/* <Cheerio initialPos={[0, 4, 2]} />
             <Cheerio initialPos={[2, 5, -1]} />
             <Cheerio initialPos={[1, 5, 2]} />
             <Cheerio initialPos={[1, 8, 2]} />
             <Cheerio initialPos={[1, 9, 2]} />
             <Cheerio initialPos={[-1, 5, 0]} /> */}
-          <Table />
-          <Bowl />
-          {/* </Debug> */}
-        </Physics>
-      </Canvas>
+            <Table />
+            <Bowl />
+            {/* </Debug> */}
+          </Physics>
+        </Canvas>
+      </Suspense>
     </div>
   );
 }
