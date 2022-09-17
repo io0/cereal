@@ -69,13 +69,13 @@ function App() {
         {/* <WackyBox position={[1.2, 0, 0]} /> */}
         <Physics>
           {/* <Debug color="green" scale={1.1}> */}
-          {[...Array(20)].map((_, i) => (
+          {[...Array(25)].map((_, i) => (
             <Cheerio
               key={i}
               initialPos={[
-                2 * Math.sin(53 * i * i),
+                1 * Math.sin(53 * i * i),
                 5 + i,
-                2 * Math.sin(53 * i * i),
+                1 * Math.sin(93 * i * i),
               ]}
               gold={settings.gold}
               pastel={settings.pastel}

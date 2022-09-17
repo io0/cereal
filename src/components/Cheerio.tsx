@@ -24,7 +24,7 @@ function toConvexProps(bufferGeometry: any) {
 }
 
 function getPastel(seed: number): string {
-  let h = (seed * 100 * Math.PI * 360) % 360;
+  const h = ((1000 * Math.sin(100000 * seed)) % 1.0) * 360;
   return "#" + convert.hsl.hex([h, 55, 71]);
 }
 
