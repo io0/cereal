@@ -4,8 +4,9 @@ import {
   Environment,
   OrbitControls,
   PerspectiveCamera,
+  Plane,
 } from "@react-three/drei";
-import { Physics, usePlane } from "@react-three/cannon";
+import { Physics, RigidBody } from "@react-three/rapier";
 import { DoubleSide } from "three";
 import Tweakpane from "tweakpane";
 
@@ -32,21 +33,21 @@ function useSettings() {
 }
 
 function Table() {
-  const [ref] = usePlane(() => ({
-    rotation: [-Math.PI / 2, 0, 0],
-    position: [0, -1.001, 0],
-  }));
-
   return (
-    <mesh ref={ref as any} receiveShadow>
-      <planeGeometry args={[10, 10]} />
-      <meshStandardMaterial
-        color="#e78688"
-        metalness={1.0}
-        roughness={0.25}
-        side={DoubleSide}
-      />
-    </mesh>
+    <RigidBody
+      colliders="cuboid"
+      position={[0, -1.001, 0]}
+      rotation={[-Math.PI / 2, 0, 0]}
+    >
+      <Plane args={[10, 10]} receiveShadow>
+        <meshStandardMaterial
+          color="#e78688"
+          metalness={1.0}
+          roughness={0.25}
+          side={DoubleSide}
+        />
+      </Plane>
+    </RigidBody>
   );
 }
 
@@ -80,13 +81,13 @@ function App() {
           {/* <WackyBox position={[1.2, 0, 0]} /> */}
           <Physics>
             {/* <Debug color="green" scale={1.1}> */}
-            {[...Array(25)].map((_, i) => (
+            {[...Array(150)].map((_, i) => (
               <Cheerio
                 key={i}
                 initialPos={[
-                  1 * Math.sin(53 * i * i),
-                  5 + i / 3 + 0.5 * Math.sin(83 * i * i),
-                  1 * Math.sin(93 * i * i),
+                  1.2 * Math.sin(53 * i * i),
+                  5 + i / 2,
+                  1.2 * Math.sin(93 * i * i),
                 ]}
                 gold={settings.gold}
                 pastel={settings.fruit}

@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { Geometry, ConvexGeometry } from "three-stdlib";
-import { useConvexPolyhedron } from "@react-three/cannon";
+import { ConvexHullCollider, RigidBody } from "@react-three/rapier";
 import { useLoader } from "@react-three/fiber";
 import { type BufferGeometry, TextureLoader, TorusGeometry } from "three";
 import convert from "color-convert";
+import { Torus } from "@react-three/drei";
 
 function toConvexProps(bufferGeometry: BufferGeometry) {
   const geo = new Geometry().fromBufferGeometry(bufferGeometry);
@@ -48,34 +49,35 @@ function Cheerio({ initialPos, gold, pastel }: CheerioProps) {
     "/textures/Wall_Plaster_002_AmbientOcclusion.jpg"
   );
 
-  const geo = useMemo(
-    () => toConvexProps(new TorusGeometry(RADIUS, TUBE, 8, 6)),
-    []
-  );
-  const [ref] = useConvexPolyhedron(() => ({
-    mass: 1,
-    position: initialPos,
-    rotation: [
-      Math.random() * 2 * Math.PI,
-      Math.random() * 2 * Math.PI,
-      Math.random() * 2 * Math.PI,
-    ],
-    args: geo as any,
-  }));
+  const collideVerts = useMemo(() => {
+    const bufferGeometry = new TorusGeometry(RADIUS, TUBE, 8, 6);
+    const geo = new Geometry().fromBufferGeometry(bufferGeometry);
+    geo.mergeVertices();
+    return geo.vertices.map((v) => v.toArray()).flat(1);
+  }, []);
 
   return (
-    <mesh ref={ref as any} castShadow receiveShadow>
-      <torusGeometry args={[RADIUS, TUBE, 64, 48]} />
-      <meshStandardMaterial
-        color={pastel ? getPastel(initialPos[0]) : "#EBAF4C"}
-        metalness={gold ? 1.0 : 0.0}
-        roughness={gold ? 0.0 : 0.5}
-        displacementMap={height}
-        displacementScale={0.05}
-        normalMap={normal}
-        aoMap={ao}
-      />
-    </mesh>
+    <RigidBody
+      position={initialPos}
+      rotation={[
+        Math.random() * 2 * Math.PI,
+        Math.random() * 2 * Math.PI,
+        Math.random() * 2 * Math.PI,
+      ]}
+    >
+      <ConvexHullCollider args={[collideVerts]} />
+      <Torus args={[RADIUS, TUBE, 64, 48]} castShadow receiveShadow>
+        <meshStandardMaterial
+          color={pastel ? getPastel(initialPos[0]) : "#EBAF4C"}
+          metalness={gold ? 1.0 : 0.0}
+          roughness={gold ? 0.0 : 0.5}
+          displacementMap={height}
+          displacementScale={0.05}
+          normalMap={normal}
+          aoMap={ao}
+        />
+      </Torus>
+    </RigidBody>
   );
 }
 
