@@ -1,6 +1,12 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { Box, Cylinder, Environment, OrbitControls } from "@react-three/drei";
+import {
+  Box,
+  Cylinder,
+  Environment,
+  OrbitControls,
+  Stats,
+} from "@react-three/drei";
 import { Physics, RigidBody } from "@react-three/rapier";
 import { DoubleSide, TextureLoader } from "three";
 import Tweakpane from "tweakpane";
@@ -123,6 +129,8 @@ function App() {
             <Table table={settings.table} />
             <Bowl />
           </Physics>
+
+          <Stats />
         </Canvas>
       </Suspense>
     </div>
