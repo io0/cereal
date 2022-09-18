@@ -13,6 +13,7 @@ function useSettings() {
     autorotate: true,
     gold: false,
     fruit: false,
+    key: 0,
   });
   const [settings, setSettings] = useState(params.current);
   useEffect(() => {
@@ -20,6 +21,10 @@ function useSettings() {
     pane.addInput(params.current, "autorotate");
     pane.addInput(params.current, "gold");
     pane.addInput(params.current, "fruit");
+    pane.addButton({ title: "Reset" }).on("click", () => {
+      params.current.key++;
+      setSettings({ ...params.current });
+    });
     pane.on("change", () => setSettings({ ...params.current }));
     return () => pane.dispose();
   }, []);
@@ -53,6 +58,7 @@ function App() {
     <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}>
       <Suspense fallback={null}>
         <Canvas
+          key={settings.key}
           onCreated={(canvasCtx) => {
             canvasCtx.gl.pixelRatio = window.devicePixelRatio;
             canvasCtx.gl.physicallyCorrectLights = true;

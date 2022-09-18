@@ -1,25 +1,14 @@
-import { useMemo } from "react";
-import { Geometry, ConvexGeometry } from "three-stdlib";
-import { ConvexHullCollider, RigidBody } from "@react-three/rapier";
+import { useMemo, useRef } from "react";
+import { Geometry } from "three-stdlib";
+import {
+  ConvexHullCollider,
+  RigidBody,
+  RigidBodyApi,
+} from "@react-three/rapier";
 import { useLoader } from "@react-three/fiber";
-import { type BufferGeometry, TextureLoader, TorusGeometry } from "three";
+import { TextureLoader, TorusGeometry } from "three";
 import convert from "color-convert";
 import { Torus } from "@react-three/drei";
-
-function toConvexProps(bufferGeometry: BufferGeometry) {
-  const geo = new Geometry().fromBufferGeometry(bufferGeometry);
-  geo.mergeVertices();
-
-  const convBufferGeo = new ConvexGeometry(geo.vertices);
-  const convGeo = new Geometry().fromBufferGeometry(convBufferGeo);
-  convGeo.mergeVertices();
-
-  return [
-    convGeo.vertices.map((v) => v.toArray()),
-    convGeo.faces.map((f) => [f.a, f.b, f.c]),
-    [],
-  ];
-}
 
 function getPastel(seed: number): string {
   const h = ((1000 * Math.sin(100000 * seed)) % 1.0) * 360;
@@ -36,6 +25,8 @@ export type CheerioProps = {
 };
 
 function Cheerio({ initialPos, gold, pastel }: CheerioProps) {
+  const rigidBodyApi = useRef<RigidBodyApi>(null);
+
   const height = useLoader(
     TextureLoader,
     "/textures/Wall_Plaster_002_Height.png"
@@ -58,6 +49,15 @@ function Cheerio({ initialPos, gold, pastel }: CheerioProps) {
 
   return (
     <RigidBody
+      ref={rigidBodyApi}
+      onPointerOver={() => {
+        rigidBodyApi.current?.applyImpulse({ x: 0, y: 1, z: 0 });
+        rigidBodyApi.current?.applyTorqueImpulse({
+          x: 0.05 * (Math.random() - 1),
+          y: 0.05 * (Math.random() - 1),
+          z: 0.05 * (Math.random() - 1),
+        });
+      }}
       position={initialPos}
       rotation={[
         Math.random() * 2 * Math.PI,
