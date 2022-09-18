@@ -1,11 +1,6 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import {
-  Environment,
-  OrbitControls,
-  PerspectiveCamera,
-  Plane,
-} from "@react-three/drei";
+import { Box, Environment, OrbitControls, Plane } from "@react-three/drei";
 import { Physics, RigidBody } from "@react-three/rapier";
 import { DoubleSide } from "three";
 import Tweakpane from "tweakpane";
@@ -35,17 +30,19 @@ function Table() {
   return (
     <RigidBody
       colliders="cuboid"
-      position={[0, -1.001, 0]}
+      lockTranslations
+      lockRotations
+      position={[0, -1.25, 0]}
       rotation={[-Math.PI / 2, 0, 0]}
     >
-      <Plane args={[10, 10]} receiveShadow>
+      <Box args={[10, 10, 0.5]} receiveShadow>
         <meshStandardMaterial
           color="#8a4e4f"
           metalness={1.0}
           roughness={0.25}
           side={DoubleSide}
         />
-      </Plane>
+      </Box>
     </RigidBody>
   );
 }
@@ -61,20 +58,20 @@ function App() {
             canvasCtx.gl.physicallyCorrectLights = true;
           }}
           shadows
+          camera={{ position: [-7, 7, -16], fov: 30 }}
         >
-          <PerspectiveCamera makeDefault fov={30} position={[-7, 8, -16]} />
           <OrbitControls makeDefault autoRotate={settings.autorotate} />
 
-          {/* <Backdrop receiveShadow scale={25.0} position={[0, -6, 0]}>
-            <meshStandardMaterial color="#353540" />
-          </Backdrop> */}
           <color attach="background" args={["#fafafa"]} />
           <Environment files="/textures/dresden_square_1k.hdr" />
 
-          {/* <group>
-            <ambientLight intensity={0.08} />
-            <pointLight intensity={20} position={[10, 10, 10]} />
-          </group> */}
+          {/* <pointLight
+            intensity={500}
+            position={[10, 30, 10]}
+            castShadow
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+          /> */}
 
           <Physics>
             {/* <Debug color="green" scale={1.1}> */}
@@ -90,15 +87,8 @@ function App() {
                 pastel={settings.fruit}
               />
             ))}
-            {/* <Cheerio initialPos={[0, 4, 2]} />
-            <Cheerio initialPos={[2, 5, -1]} />
-            <Cheerio initialPos={[1, 5, 2]} />
-            <Cheerio initialPos={[1, 8, 2]} />
-            <Cheerio initialPos={[1, 9, 2]} />
-            <Cheerio initialPos={[-1, 5, 0]} /> */}
             <Table />
             <Bowl />
-            {/* </Debug> */}
           </Physics>
         </Canvas>
       </Suspense>

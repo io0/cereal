@@ -7,7 +7,7 @@ import bowlObject from "../assets/bowl.glb?url";
 function Bowl() {
   const gltf = useLoader(GLTFLoader, bowlObject);
   return (
-    <RigidBody colliders="trimesh" position={[0, -1, 0]}>
+    <RigidBody colliders="trimesh" position={[0, 1, 0]}>
       <primitive object={gltf.scene} scale={3} />
     </RigidBody>
   );

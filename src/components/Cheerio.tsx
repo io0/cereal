@@ -26,8 +26,8 @@ function getPastel(seed: number): string {
   return "#" + convert.hsl.hex([h, 55, 71]);
 }
 
-const RADIUS = 0.26;
-const TUBE = 0.12;
+const RADIUS = 0.23;
+const TUBE = 0.1;
 
 export type CheerioProps = {
   initialPos: [number, number, number];
