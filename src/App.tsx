@@ -1,18 +1,20 @@
 import { Suspense, useEffect, useRef, useState } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Box, Environment, OrbitControls, Plane } from "@react-three/drei";
+import { Canvas, useLoader } from "@react-three/fiber";
+import { Box, Cylinder, Environment, OrbitControls } from "@react-three/drei";
 import { Physics, RigidBody } from "@react-three/rapier";
-import { DoubleSide } from "three";
+import { DoubleSide, TextureLoader } from "three";
 import Tweakpane from "tweakpane";
 
 import Bowl from "./components/Bowl";
 import Cheerio from "./components/Cheerio";
+import { RigidBodyApi } from "@react-three/rapier/dist/declarations/src/types";
 
 function useSettings() {
   const params = useRef({
     autorotate: true,
     gold: false,
     fruit: false,
+    table: 0,
     key: 0,
   });
   const [settings, setSettings] = useState(params.current);
@@ -21,6 +23,7 @@ function useSettings() {
     pane.addInput(params.current, "autorotate");
     pane.addInput(params.current, "gold");
     pane.addInput(params.current, "fruit");
+    pane.addInput(params.current, "table", { min: 0, max: 1 });
     pane.addButton({ title: "Reset" }).on("click", () => {
       params.current.key++;
       setSettings({ ...params.current });
@@ -31,24 +34,44 @@ function useSettings() {
   return settings;
 }
 
-function Table() {
+function Table({ table }: { table: number }) {
+  const tableRef = useRef<RigidBodyApi>(null);
+
+  const color = useLoader(
+    TextureLoader,
+    "/textures/wood_table_001_diff_1k.jpg"
+  );
+  const roughness = useLoader(
+    TextureLoader,
+    "/textures/wood_table_001_rough_1k.jpg"
+  );
+
+  useEffect(() => {
+    tableRef.current?.setTranslation({ x: 0, y: table, z: 0 });
+  }, [table]);
+
   return (
-    <RigidBody
-      colliders="cuboid"
-      lockTranslations
-      lockRotations
-      position={[0, -1.25, 0]}
-      rotation={[-Math.PI / 2, 0, 0]}
-    >
-      <Box args={[10, 10, 0.5]} receiveShadow>
-        <meshStandardMaterial
-          color="#8a4e4f"
-          metalness={1.0}
-          roughness={0.25}
-          side={DoubleSide}
-        />
-      </Box>
-    </RigidBody>
+    <>
+      <RigidBody
+        ref={tableRef}
+        colliders="cuboid"
+        lockTranslations
+        lockRotations
+        ccd
+      >
+        <Box args={[10, 0.5, 10]} receiveShadow position={[0, -1.25, 0]}>
+          <meshStandardMaterial
+            map={color}
+            roughnessMap={roughness}
+            side={DoubleSide}
+          />
+        </Box>
+
+        <Cylinder args={[0.5, 0.5, 8, 16, 32]} position={[0, -5.25, 0]}>
+          <meshStandardMaterial map={color} roughnessMap={roughness} />
+        </Cylinder>
+      </RigidBody>
+    </>
   );
 }
 
@@ -64,12 +87,16 @@ function App() {
             canvasCtx.gl.physicallyCorrectLights = true;
           }}
           shadows
-          camera={{ position: [-7, 7, -16], fov: 30 }}
+          camera={{ position: [-7, 7, -16], fov: 35 }}
         >
-          <OrbitControls makeDefault autoRotate={settings.autorotate} />
+          <OrbitControls
+            makeDefault
+            autoRotate={settings.autorotate}
+            autoRotateSpeed={0.5}
+          />
 
-          <color attach="background" args={["#fafafa"]} />
-          <Environment files="/textures/dresden_square_1k.hdr" />
+          {/* <color attach="background" args={["#fafafa"]} /> */}
+          <Environment background files="/textures/dresden_square_2k.hdr" />
 
           {/* <pointLight
             intensity={500}
@@ -93,7 +120,7 @@ function App() {
                 pastel={settings.fruit}
               />
             ))}
-            <Table />
+            <Table table={settings.table} />
             <Bowl />
           </Physics>
         </Canvas>
