@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import {
   Environment,
@@ -7,11 +7,29 @@ import {
 } from "@react-three/drei";
 import { Physics, usePlane } from "@react-three/cannon";
 import { DoubleSide } from "three";
-import { useTweaks } from "use-tweaks";
+import Tweakpane from "tweakpane";
 
 import Bowl from "./components/Bowl";
 import Cheerio from "./components/Cheerio";
 // import WackyBox from "./components/WackyBox";
+
+function useSettings() {
+  const params = useRef({
+    autorotate: true,
+    gold: false,
+    fruit: false,
+  });
+  const [settings, setSettings] = useState(params.current);
+  useEffect(() => {
+    const pane = new Tweakpane({ title: "Cereal!" });
+    pane.addInput(params.current, "autorotate");
+    pane.addInput(params.current, "gold");
+    pane.addInput(params.current, "fruit");
+    pane.on("change", () => setSettings({ ...params.current }));
+    return () => pane.dispose();
+  }, []);
+  return settings;
+}
 
 function Table() {
   const [ref] = usePlane(() => ({
@@ -33,12 +51,7 @@ function Table() {
 }
 
 function App() {
-  const settings = useTweaks({
-    autorotate: false,
-    gold: false,
-    fruit: false,
-  }) as any;
-
+  const settings = useSettings();
   return (
     <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}>
       <Suspense fallback={null}>
@@ -55,7 +68,8 @@ function App() {
           {/* <Backdrop receiveShadow scale={25.0} position={[0, -6, 0]}>
             <meshStandardMaterial color="#353540" />
           </Backdrop> */}
-          <Environment background files="/textures/dresden_square_1k.hdr" />
+          <color attach="background" args={["#fafafa"]} />
+          <Environment files="/textures/dresden_square_1k.hdr" />
 
           {/* <group>
             <ambientLight intensity={0.08} />
