@@ -12,7 +12,6 @@ import Tweakpane from "tweakpane";
 
 import Bowl from "./components/Bowl";
 import Cheerio from "./components/Cheerio";
-// import WackyBox from "./components/WackyBox";
 
 function useSettings() {
   const params = useRef({
@@ -41,7 +40,7 @@ function Table() {
     >
       <Plane args={[10, 10]} receiveShadow>
         <meshStandardMaterial
-          color="#e78688"
+          color="#8a4e4f"
           metalness={1.0}
           roughness={0.25}
           side={DoubleSide}
@@ -77,16 +76,14 @@ function App() {
             <pointLight intensity={20} position={[10, 10, 10]} />
           </group> */}
 
-          {/* <WackyBox position={[-1.2, 0, 0]} /> */}
-          {/* <WackyBox position={[1.2, 0, 0]} /> */}
           <Physics>
             {/* <Debug color="green" scale={1.1}> */}
-            {[...Array(150)].map((_, i) => (
+            {[...Array(120)].map((_, i) => (
               <Cheerio
                 key={i}
                 initialPos={[
                   1.2 * Math.sin(53 * i * i),
-                  5 + i / 2,
+                  5 + i / 3,
                   1.2 * Math.sin(93 * i * i),
                 ]}
                 gold={settings.gold}
