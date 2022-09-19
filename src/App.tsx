@@ -1,14 +1,15 @@
 import { Suspense, useEffect, useRef, useState } from "react";
-import { Canvas, useLoader } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import {
   Box,
   Cylinder,
   Environment,
   OrbitControls,
   Stats,
+  useTexture,
 } from "@react-three/drei";
 import { Physics, RigidBody } from "@react-three/rapier";
-import { DoubleSide, TextureLoader } from "three";
+import { DoubleSide } from "three";
 import Tweakpane from "tweakpane";
 
 import Bowl from "./components/Bowl";
@@ -43,14 +44,10 @@ function useSettings() {
 function Table({ table }: { table: number }) {
   const tableRef = useRef<RigidBodyApi>(null);
 
-  const color = useLoader(
-    TextureLoader,
-    "/textures/wood_table_001_diff_1k.jpg"
-  );
-  const roughness = useLoader(
-    TextureLoader,
-    "/textures/wood_table_001_rough_1k.jpg"
-  );
+  const [color, roughness] = useTexture([
+    "/textures/wood_table_001_diff_1k.jpg",
+    "/textures/wood_table_001_rough_1k.jpg",
+  ]);
 
   useEffect(() => {
     tableRef.current?.setTranslation({ x: 0, y: table, z: 0 });

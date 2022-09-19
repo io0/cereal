@@ -5,10 +5,9 @@ import {
   RigidBody,
   RigidBodyApi,
 } from "@react-three/rapier";
-import { useLoader } from "@react-three/fiber";
-import { TextureLoader, TorusGeometry } from "three";
+import { TorusGeometry } from "three";
 import convert from "color-convert";
-import { Torus } from "@react-three/drei";
+import { Torus, useTexture } from "@react-three/drei";
 
 function getPastel(seed: number): string {
   const h = ((1000 * Math.sin(100000 * seed)) % 1.0) * 360;
@@ -27,18 +26,11 @@ export type CheerioProps = {
 function Cheerio({ initialPos, gold, pastel }: CheerioProps) {
   const rigidBodyApi = useRef<RigidBodyApi>(null);
 
-  const height = useLoader(
-    TextureLoader,
-    "/textures/Wall_Plaster_002_Height.png"
-  );
-  const normal = useLoader(
-    TextureLoader,
-    "/textures/Wall_Plaster_002_Normal.jpg"
-  );
-  const ao = useLoader(
-    TextureLoader,
-    "/textures/Wall_Plaster_002_AmbientOcclusion.jpg"
-  );
+  const [height, normal, ao] = useTexture([
+    "/textures/Wall_Plaster_002_Height.png",
+    "/textures/Wall_Plaster_002_Normal.jpg",
+    "/textures/Wall_Plaster_002_AmbientOcclusion.jpg",
+  ]);
 
   const collideVerts = useMemo(() => {
     const bufferGeometry = new TorusGeometry(RADIUS, TUBE, 8, 6);
